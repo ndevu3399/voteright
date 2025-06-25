@@ -6,6 +6,7 @@ import Vote from "./pages/Vote";
 import Dashboard from "./pages/Dashboard";
 import Navbar from "./components/Navbar";
 import { AuthProvider, useAuth } from "./context/AuthContext"; // ✅ fixed path
+import NotFound from "./pages/NotFound";
 
 function PrivateRoute({ children }) {
   const { user } = useAuth();
@@ -22,6 +23,8 @@ function App() {
           <Route path="/register" element={<Register />} />
           <Route path="/polls" element={<PrivateRoute><Polls /></PrivateRoute>} />
           <Route path="/vote/:pollId" element={<PrivateRoute><Vote /></PrivateRoute>} />
+          <Route path="*" element={<NotFound />} />
+
           <Route path="/dashboard" element={<PrivateRoute><Dashboard /></PrivateRoute>} />
         </Routes>
       </BrowserRouter>
