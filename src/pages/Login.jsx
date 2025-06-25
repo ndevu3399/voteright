@@ -13,7 +13,7 @@ function Login() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const res = await api.post("/login", form);
+      const res = await api.post("http://localhost:5000/login", form);
       login(res.data);
       navigate("/polls");
     } catch (err) {
