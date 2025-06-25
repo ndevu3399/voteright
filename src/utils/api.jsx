@@ -1,6 +1,6 @@
 import axios from "axios";
 
-const BASE_URL = "http://localhost:5000"; // change to your Flask backend URL
+const BASE_URL = "http://localhost:5000";
 
 // Axios instance
 const axiosInstance = axios.create({
