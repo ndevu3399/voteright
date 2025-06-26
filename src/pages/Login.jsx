@@ -11,16 +11,19 @@ function Login() {
   const handleChange = (e) =>
     setForm({ ...form, [e.target.name]: e.target.value });
 
-  const handleSubmit = async (e) => {
+    const handleSubmit = async (e) => {
     e.preventDefault();
+
     try {
-      const res = await api.post("http://localhost:5000/login", form);
+      const res = await api.post("/auth/login", form); 
       login(res.data);
-      navigate("/polls");
-    } catch (err) {
-      alert("Login failed");
+      navigate("/dashboard");
+    } catch (error) {
+      console.error("Login error:", error); 
+      alert("Login failed. Please check your credentials and try again.");
     }
   };
+
 
   return (
     <div className="container mt-5">
