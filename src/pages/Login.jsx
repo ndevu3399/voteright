@@ -9,20 +9,21 @@ function Login() {
   const [form, setForm] = useState({ username: "", password: "" });
 
   const handleChange = (e) =>
-    setForm({ ...form, [e.target.name]: e.target.value });
+  setForm({ ...form, [e.target.name]: e.target.value });
 
-    const handleSubmit = async (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
 
     try {
-      const res = await api.post("/auth/login", form); 
-      login(res.data);
+      const res = await api.login(form); 
+      login(res); 
       navigate("/dashboard");
     } catch (error) {
-      console.error("Login error:", error); 
+      console.error("Login error:", error);
       alert("Login failed. Please check your credentials and try again.");
     }
   };
+
 
 
   return (

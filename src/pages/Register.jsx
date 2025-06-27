@@ -10,16 +10,18 @@ function Register() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    console.log("Submitting form with:", form);
 
     try {
-      await api.post("/auth/register", form);
+      await api.register(form);
       alert("Registered! Redirecting to login...");
       navigate("/");
     } catch (error) {
-      console.error("Registration failed:", error); 
-      alert("Registration failed. Please try again.");
+      console.error("Registration failed:", error.response || error.message);
+      alert(error.response?.data?.msg || "Registration failed. Please try again.");
     }
   };
+
 
 
   return (
