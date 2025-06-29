@@ -9,10 +9,11 @@ function Login() {
   const [form, setForm] = useState({ username: "", password: "" });
 
   const handleChange = (e) =>
-    setForm({ ...form, [e.target.name]: e.target.value });
+  setForm({ ...form, [e.target.name]: e.target.value });
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+
     try {
       const res = await api.login(form);
       login(res);
@@ -21,6 +22,8 @@ function Login() {
       alert("Login failed. Please check your credentials.");
     }
   };
+
+
 
   return (
     <div className="d-flex justify-content-center align-items-center" style={{ minHeight: "90vh", backgroundColor: "#f8f9fa" }}>

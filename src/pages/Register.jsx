@@ -10,6 +10,8 @@ function Register() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    console.log("Submitting form with:", form);
+
     try {
       await api.register(form);
       alert("🎉 Registered successfully! Please log in.");
@@ -18,6 +20,8 @@ function Register() {
       alert("⚠️ Registration failed. Please try a different username.");
     }
   };
+
+
 
   return (
     <div className="d-flex justify-content-center align-items-center" style={{ minHeight: "90vh", backgroundColor: "#f8f9fa" }}>
