@@ -34,4 +34,12 @@ def create_app():
     def index():
         return {"message": "API is running"}
 
+    with app.app_context():
+        try:
+            db.engine.connect()
+            print("✅ Database connection successful!")
+        except Exception as e:
+            print("❌ Database connection failed:", str(e))
+    
+
     return app
