@@ -2,7 +2,7 @@ import axios from "axios";
 
 const BASE_URL = "http://localhost:5000";
 
-// Axios instance
+
 const axiosInstance = axios.create({
   baseURL: BASE_URL,
   headers: {
@@ -10,7 +10,7 @@ const axiosInstance = axios.create({
   },
 });
 
-// Add JWT token if available
+
 axiosInstance.interceptors.request.use((config) => {
   const token = localStorage.getItem("token");
   if (token) {
@@ -19,7 +19,7 @@ axiosInstance.interceptors.request.use((config) => {
   return config;
 });
 
-// API methods
+
 const api = {
   login: async (credentials) => {
     const res = await axiosInstance.post("/login", credentials);
@@ -37,12 +37,18 @@ const api = {
   },
 
   vote: async (pollId, optionId) => {
-    const res = await axiosInstance.post(`/vote/${pollId}`, { option_id: optionId });
+    const res = await axiosInstance.post(`/polls/${pollId}/vote`, { choice_id: optionId });
     return res.data;
   },
 
   getDashboardData: async () => {
     const res = await axiosInstance.get("/dashboard");
+    return res.data;
+  },
+
+  
+  getUsers: async () => {
+    const res = await axiosInstance.get("/users");
     return res.data;
   },
 };
