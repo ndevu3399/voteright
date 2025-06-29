@@ -4,8 +4,9 @@ import Register from "./pages/Register";
 import Polls from "./pages/Polls";
 import Vote from "./pages/Vote";
 import Dashboard from "./pages/Dashboard";
+import CreatePoll from "./pages/CreatePoll"; // ✅ Import CreatePoll
 import Navbar from "./components/Navbar";
-import { AuthProvider, useAuth } from "./context/AuthContext"; // ✅ fixed path
+import { AuthProvider, useAuth } from "./context/AuthContext";
 import NotFound from "./pages/NotFound";
 
 function PrivateRoute({ children }) {
@@ -19,13 +20,18 @@ function App() {
       <BrowserRouter>
         <Navbar />
         <Routes>
+          {/* Public routes */}
           <Route path="/" element={<Login />} />
           <Route path="/register" element={<Register />} />
+
+          {/* Private routes */}
+          <Route path="/dashboard" element={<PrivateRoute><Dashboard /></PrivateRoute>} />
           <Route path="/polls" element={<PrivateRoute><Polls /></PrivateRoute>} />
           <Route path="/vote/:pollId" element={<PrivateRoute><Vote /></PrivateRoute>} />
-          <Route path="*" element={<NotFound />} />
+          <Route path="/create-poll" element={<PrivateRoute><CreatePoll /></PrivateRoute>} />
 
-          <Route path="/dashboard" element={<PrivateRoute><Dashboard /></PrivateRoute>} />
+          {/* Fallback */}
+          <Route path="*" element={<NotFound />} />
         </Routes>
       </BrowserRouter>
     </AuthProvider>

@@ -31,15 +31,19 @@ const api = {
     return res.data;
   },
 
-  vote: async (pollId, choiceId) => {
-    const res = await axiosInstance.post(`/api/polls/${pollId}/vote`, {
-      choice_id: choiceId,
-    });
+  vote: async (pollId, optionId) => {
+    const res = await axiosInstance.post(`/polls/${pollId}/vote`, { choice_id: optionId });
     return res.data;
   },
 
   getDashboardData: async () => {
     const res = await axiosInstance.get("/api/dashboard");
+    return res.data;
+  },
+
+  
+  getUsers: async () => {
+    const res = await axiosInstance.get("/users");
     return res.data;
   },
 };
