@@ -11,10 +11,11 @@ function Register() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      await api.post("/register", form);
+      await api.register(form);  // ✅ use the correct wrapper function
       alert("Registered! You can now log in.");
       navigate("/");
     } catch (err) {
+      console.error("Registration error:", err.response?.data || err.message);
       alert("Registration failed");
     }
   };
@@ -50,7 +51,7 @@ function Register() {
                     required
                   />
                 </div>
-                <button className="btn btn-success w-100">Register</button>
+                <button type="submit" className="btn btn-success w-100">Register</button>
               </form>
               <div className="text-center mt-3">
                 <small>

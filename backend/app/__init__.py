@@ -1,10 +1,9 @@
-# __init__.py
-
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
 from flask_bcrypt import Bcrypt
 from flask_jwt_extended import JWTManager
+from flask_cors import CORS  # ✅ Import CORS
 
 db = SQLAlchemy()
 migrate = Migrate()
@@ -19,6 +18,9 @@ def create_app():
     migrate.init_app(app, db)
     bcrypt.init_app(app)
     jwt.init_app(app)
+
+    # ✅ Enable CORS for requests from frontend
+    CORS(app, origins=["http://localhost:5173"])
 
     from app.auth import auth_bp
     app.register_blueprint(auth_bp, url_prefix="/")

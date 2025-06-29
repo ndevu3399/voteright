@@ -14,10 +14,11 @@ function Login() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const res = await api.post("http://localhost:5000/login", form);
-      login(res.data);
+      const res = await api.login(form); // ✅ Use wrapper method
+      login(res); // This should store token, username, role, etc.
       navigate("/polls");
     } catch (err) {
+      console.error("Login error:", err.response?.data || err.message);
       alert("Login failed");
     }
   };
