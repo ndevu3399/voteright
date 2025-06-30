@@ -5,10 +5,10 @@ from app.models import User, Poll
 
 admin_bp = Blueprint("admin", __name__)
 
-# ───────── decorator ─────────
+# ───── decorator ────────────────────────────────────
 def admin_required(fn):
     @wraps(fn)
-    @jwt_required()  # ensures token exists
+    @jwt_required()
     def wrapper(*args, **kwargs):
         uid  = int(get_jwt_identity())
         user = User.query.get(uid)
@@ -17,22 +17,19 @@ def admin_required(fn):
         return fn(*args, **kwargs)
     return wrapper
 
-# ───────── /users ─────────
+# ───── /users ───────────────────────────────────────
 @admin_bp.route("/users", methods=["GET"])
 @admin_required
-def list_users():
-    users = User.query.order_by(User.id).all()
-    return jsonify([{"id": u.id, "username": u.username, "role": u.role} for u in users])
+def users():
+    rows = User.query.order_by(User.id).all()
+    return jsonify([{"id": u.id, "username": u.username, "role": u.role} for u in rows])
 
-# ───────── /results ─────────
+# ───── /results ─────────────────────────────────────
 @admin_bp.route("/results", methods=["GET"])
 @admin_required
-def poll_results():
-    polls = Poll.query.all()
-    out   = []
-    for p in polls:
-        out.append({
-            "poll":   p.title,
-            "totals": {c.text: len(c.votes) for c in p.choices},
-        })
-    return jsonify(out)
+def results():
+    data = []
+    for p in Poll.query.all():
+        totals = {c.text: len(c.votes) for c in p.choices}
+        data.append({"poll": p.title, "totals": totals})
+    return jsonify(data)

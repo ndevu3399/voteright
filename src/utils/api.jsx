@@ -1,51 +1,38 @@
 import axios from "axios";
 
-const BASE_URL = "https://voteright.onrender.com";
-
+/* ▶️  ONE base URL that already ends with /api */
 const axiosInstance = axios.create({
-  baseURL: BASE_URL,
+  baseURL: "https://voteright.onrender.com/api",
   headers: { "Content-Type": "application/json" },
 });
 
-axiosInstance.interceptors.request.use((config) => {
-  const token = localStorage.getItem("token");
-  if (token) {
-    config.headers.Authorization = `Bearer ${token}`;
-  }
-  return config;
+axiosInstance.interceptors.request.use((cfg) => {
+  const tok = localStorage.getItem("token");
+  if (tok) cfg.headers.Authorization = `Bearer ${tok}`;
+  return cfg;
 });
 
-const api = {
-  login: async (credentials) => {
-    const res = await axiosInstance.post("/api/auth/login", credentials);
-    return res.data;
-  },
+/* ─── Auth ───────────────────────────────────────── */
+const login    = (body) => axiosInstance.post("/auth/login",    body).then(r => r.data);
+const register = (body) => axiosInstance.post("/auth/register", body);
 
-  register: async (data) => {
-    const res = await axiosInstance.post("/api/auth/register", data);
-    return res.data;
-  },
+/* ─── Polls ──────────────────────────────────────── */
+const getPolls   = ()                => axiosInstance.get("/polls").then(r => r.data);
+const getPoll    = (id)              => axiosInstance.get(`/polls/${id}`).then(r => r.data);
+const vote       = (id, choice_id)   => axiosInstance.post(`/polls/${id}/vote`, { choice_id });
+const createPoll = (body)            => axiosInstance.post("/polls", body);
 
-  getPolls: async () => {
-    const res = await axiosInstance.get("/api/polls");
-    return res.data;
-  },
+/* ─── Admin ──────────────────────────────────────── */
+const getUsers   = () => axiosInstance.get("/users"  ).then(r => r.data);
+const getResults = () => axiosInstance.get("/results").then(r => r.data);
 
-  vote: async (pollId, optionId) => {
-    const res = await axiosInstance.post(`/polls/${pollId}/vote`, { choice_id: optionId });
-    return res.data;
-  },
-
-  getDashboardData: async () => {
-    const res = await axiosInstance.get("/api/dashboard");
-    return res.data;
-  },
-
-  
-  getUsers: async () => {
-    const res = await axiosInstance.get("/users");
-    return res.data;
-  },
+export default {
+  login,
+  register,
+  getPolls,
+  getPoll,
+  vote,
+  createPoll,
+  getUsers,
+  getResults,
 };
-
-export default api;

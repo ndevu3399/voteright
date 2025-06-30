@@ -29,6 +29,8 @@ function App() {
           <Route path="/polls" element={<PrivateRoute><Polls /></PrivateRoute>} />
           <Route path="/vote/:pollId" element={<PrivateRoute><Vote /></PrivateRoute>} />
           <Route path="/create-poll" element={<PrivateRoute><CreatePoll /></PrivateRoute>} />
+          <Route path="/results" element={<PrivateRoute><Results /></PrivateRoute>} />
+          <Route path="/users"   element={<PrivateRoute><Users   /></PrivateRoute>} />
 
           {/* Fallback */}
           <Route path="*" element={<NotFound />} />
