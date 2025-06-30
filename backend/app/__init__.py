@@ -16,7 +16,6 @@ def create_app():
     app = Flask(__name__)
     app.config.from_object("app.config.Config")
 
-    # allow local dev **and** your production front‑end
     CORS(app,
          origins=[
             "http://localhost:5173",
@@ -31,14 +30,14 @@ def create_app():
 
     from app.auth   import auth_bp
     from app.routes import poll_bp
-    from app.admin  import admin_bp          # NEW blueprint
+    from app.admin  import admin_bp
 
     app.register_blueprint(auth_bp,   url_prefix="/api/auth")
     app.register_blueprint(poll_bp,   url_prefix="/api/polls")
-    app.register_blueprint(admin_bp,  url_prefix="/api")       # /api/users, /api/results
+    app.register_blueprint(admin_bp,  url_prefix="/api")
 
-    @app.before_first_request
-    def create_tables():
+    # ✅ Table creation using context (Flask 3.x compatible)
+    with app.app_context():
         db.create_all()
 
     @app.route("/")
