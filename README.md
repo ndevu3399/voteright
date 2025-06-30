@@ -1,12 +1,64 @@
-# React + Vite
+# 🗳️ VoteRight - Fullstack Voting App
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+VoteRight is a collaborative fullstack web application for creating and participating in polls. Users can sign up, log in, vote on polls, and view results in real-time.
 
-Currently, two official plugins are available:
+This project is built with:
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+- 🔥 **Backend**: Flask (Python), PostgreSQL, Alembic
+- ⚛️ **Frontend**: React.js
+- 🔐 **Auth**: JWT (Flask-JWT-Extended)
+- 🌐 **CORS**: Flask-CORS
+- 📦 **ORM**: SQLAlchemy
+- 📄 **Serialization**: Marshmallow
 
-## Expanding the ESLint configuration
+---
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+## 📁 Project Structure
+
+voteright/
+├── backend/
+│ ├── app/
+│ │ ├── init.py # App factory
+│ │ ├── models.py # SQLAlchemy models
+│ │ ├── routes/ # Blueprint routes (auth, polls, votes)
+│ │ ├── schemas.py # Marshmallow schemas
+│ ├── migrations/ # Alembic migration files
+│ ├── main.py # Entry point
+│ └── config.py # Environment-based config
+│
+├── frontend/
+│ ├── src/
+│ │ ├── components/ # React UI components
+│ │ ├── pages/ # Login, Dashboard, Polls, etc.
+│ │ ├── App.js
+│ │ └── api/ # Axios client setup
+│
+├── requirements.txt # Backend dependencies
+├── README.md # This file
+└── .env # Environment variables
+
+
+
+
+---
+
+## 🚀 Features
+
+- ✅ JWT Authentication (Register / Login / Logout)
+- ✅ Create, vote, and manage polls
+- ✅ View poll choices and total vote count
+- ✅ Role-based access (admin vs regular users)
+- ✅ RESTful API with token protection
+- ✅ PostgreSQL + Alembic migrations
+- ✅ Responsive React frontend
+
+---
+
+## 🛠️ Backend Setup (Flask)
+
+### 1. Clone the repo
+
+```bash
+git clone https://github.com/theMungai/voteright.git
+cd voteright/backend
+
