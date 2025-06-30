@@ -1,13 +1,16 @@
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
+import Results from "./pages/Results";
 import Polls from "./pages/Polls";
 import Vote from "./pages/Vote";
 import Dashboard from "./pages/Dashboard";
-import CreatePoll from "./pages/CreatePoll"; // ✅ Import CreatePoll
+import CreatePoll from "./pages/CreatePoll";
+import Users from "./pages/Users"; // ✅ Add this line
 import Navbar from "./components/Navbar";
 import { AuthProvider, useAuth } from "./context/AuthContext";
 import NotFound from "./pages/NotFound";
+
 
 function PrivateRoute({ children }) {
   const { user } = useAuth();

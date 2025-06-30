@@ -1,6 +1,5 @@
 import axios from "axios";
 
-/* ▶️  ONE base URL that already ends with /api */
 const axiosInstance = axios.create({
   baseURL: "https://voteright.onrender.com/api",
   headers: { "Content-Type": "application/json" },

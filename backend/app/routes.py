@@ -32,25 +32,31 @@ def single_poll(poll_id):
 @poll_bp.route("/<int:poll_id>/vote", methods=["POST"])
 @jwt_required()
 def vote(poll_id):
-    uid       = int(get_jwt_identity())
-    choice_id = request.get_json().get("choice_id")
+    data = request.get_json()
+    choice_id = data.get("choice_id")
+    user_id = get_jwt_identity()
 
-    # validate poll & choice
+    # 1. Ensure poll exists
+    poll = Poll.query.get_or_404(poll_id)
+
+    # 2. Prevent double voting
+    existing_vote = Vote.query.filter_by(user_id=user_id, poll_id=poll_id).first()
+    if existing_vote:
+        return jsonify({"msg": "You have already voted"}), 400
+
+    # 3. Ensure choice belongs to the poll
     choice = Choice.query.filter_by(id=choice_id, poll_id=poll_id).first()
     if not choice:
         return jsonify({"msg": "Invalid choice"}), 400
 
-    # one vote per poll per user
-    already = Vote.query.join(Choice).filter(
-        Vote.user_id == uid,
-        Choice.poll_id == poll_id
-    ).first()
-    if already:
-        return jsonify({"msg": "Already voted"}), 400
-
-    db.session.add(Vote(user_id=uid, choice_id=choice_id))
+    # 4. Save vote
+    vote = Vote(user_id=user_id, poll_id=poll_id, choice_id=choice_id)
+    db.session.add(vote)
     db.session.commit()
+
     return jsonify({"msg": "Vote submitted"}), 201
+
+
 
 # ───────── Create poll (admin only) ─────────
 @poll_bp.route("", methods=["POST"])

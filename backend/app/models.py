@@ -26,7 +26,14 @@ class Choice(db.Model):
     votes = db.relationship("Vote", backref="choice", lazy=True)
 
 class Vote(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    user_id = db.Column(db.Integer, db.ForeignKey("user.id"), nullable=False)
-    choice_id = db.Column(db.Integer, db.ForeignKey("choice.id"), nullable=False)
-    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    __tablename__ = "votes"
+
+    id         = db.Column(db.Integer, primary_key=True)
+    user_id    = db.Column(db.Integer, db.ForeignKey("users.id"), nullable=False)
+    poll_id    = db.Column(db.Integer, db.ForeignKey("polls.id"), nullable=False)
+    choice_id  = db.Column(db.Integer, db.ForeignKey("choices.id"), nullable=False)
+
+    user   = db.relationship("User", back_populates="votes")
+    poll   = db.relationship("Poll", back_populates="votes")
+    choice = db.relationship("Choice")
+

@@ -45,13 +45,3 @@ def create_app():
         return {"message": "API is running"}
 
     return app
-
-#  from app.models import User
-# user = User.query.filter_by(username="mungai").first()
-
-# >>> if user:
-# ...     user.role="admin"
-# ...     db.session.commit()
-# ...     print("Mungai has been promoted to admin")
-# ... else:
-# ...     print("Mungai not found")

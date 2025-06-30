@@ -1,45 +1,46 @@
-import { useEffect, useState } from "react";
-import { useNavigate, useParams } from "react-router-dom";
 import api from "../utils/api";
+import { useParams } from "react-router-dom";
+import { useState, useEffect } from "react";
 
 function Vote() {
   const { pollId } = useParams();
-  const navigate   = useNavigate();
-  const [poll, setPoll]   = useState(null);
-  const [choice, setChoice] = useState(null);
+  const [poll, setPoll] = useState(null);
+  const [selected, setSelected] = useState(null);
 
   useEffect(() => {
     api.getPoll(pollId)
       .then(setPoll)
-      .catch(() => navigate("/polls"));
-  }, [pollId, navigate]);
+      .catch(() => alert("Error fetching poll"));
+  }, [pollId]);
 
-  const handle = async () => {
-    if (!choice) return alert("Select an option first.");
-    try {
-      await api.vote(pollId, choice);
-      alert("✅ Vote submitted!");
-      navigate("/polls");
-    } catch (e) {
-      alert(e.response?.data?.msg || "Vote failed.");
-    }
+  const handleVote = () => {
+    if (!selected) return alert("Please select a choice");
+
+    api.vote(pollId, selected)
+      .then(() => alert("Vote submitted"))
+      .catch((err) => {
+        console.error("Vote error:", err);
+        alert("Could not vote");
+      });
   };
 
-  if (!poll) return <div className="text-center mt-5">Loading…</div>;
+  if (!poll) return <p>Loading...</p>;
 
   return (
-    <div className="container mt-4">
-      <h3 className="mb-4">{poll.title}</h3>
-      {poll.choices.map(c => (
-        <div key={c.id} className="form-check mb-2">
-          <input className="form-check-input" type="radio"
-                 id={`c${c.id}`} name="choice" value={c.id}
-                 onChange={() => setChoice(c.id)} />
-          <label className="form-check-label" htmlFor={`c${c.id}`}>{c.text}</label>
+    <div>
+      <h2>{poll.question}</h2>
+      {poll.choices.map((ch) => (
+        <div key={ch.id}>
+          <label>
+            <input type="radio" name="choice" value={ch.id}
+              onChange={() => setSelected(ch.id)} />
+            {ch.text}
+          </label>
         </div>
       ))}
-      <button className="btn btn-success mt-3" onClick={handle}>Submit Vote</button>
+      <button onClick={handleVote}>Vote</button>
     </div>
   );
 }
+
 export default Vote;
