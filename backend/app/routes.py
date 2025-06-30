@@ -1,74 +1,81 @@
-# routes.py
-
-from flask import Blueprint, jsonify, request
+from flask import Blueprint, request, jsonify
 from flask_jwt_extended import jwt_required, get_jwt_identity
 from app import db
 from app.models import Poll, Choice, Vote
-from app.schemas import PollSchema
 
 poll_bp = Blueprint("polls", __name__)
 
-poll_schema = PollSchema()
-polls_schema = PollSchema(many=True)
-
+# ───────── Public poll list ─────────
 @poll_bp.route("/", methods=["GET"])
-def get_polls():
-    polls = Poll.query.all()
-    return polls_schema.jsonify(polls)
+def list_polls():
+    polls = Poll.query.order_by(Poll.created_at.desc()).all()
+    out = []
+    for p in polls:
+        out.append({
+            "id":      p.id,
+            "title":   p.title,
+            "choices": [{"id": c.id, "text": c.text} for c in p.choices],
+        })
+    return jsonify(out)
 
+# ───────── Single poll ─────────
 @poll_bp.route("/<int:poll_id>", methods=["GET"])
-def get_poll(poll_id):
-    poll = Poll.query.get_or_404(poll_id)
-    return poll_schema.jsonify(poll)
+def single_poll(poll_id):
+    p = Poll.query.get_or_404(poll_id)
+    return jsonify({
+        "id":      p.id,
+        "title":   p.title,
+        "choices": [{"id": c.id, "text": c.text} for c in p.choices],
+    })
 
+# ───────── Vote (user) ─────────
 @poll_bp.route("/<int:poll_id>/vote", methods=["POST"])
 @jwt_required()
 def vote(poll_id):
-    user_id = int(get_jwt_identity())
+    uid       = int(get_jwt_identity())
+    choice_id = request.get_json().get("choice_id")
 
-    poll = Poll.query.get_or_404(poll_id)
-    data = request.get_json()
-    choice_id = data.get("choice_id")
-
+    # validate poll & choice
     choice = Choice.query.filter_by(id=choice_id, poll_id=poll_id).first()
     if not choice:
         return jsonify({"msg": "Invalid choice"}), 400
 
-    # Check if user already voted on this poll
-    existing_vote = Vote.query.join(Choice).filter(
-        Vote.user_id == user_id,
+    # one vote per poll per user
+    already = Vote.query.join(Choice).filter(
+        Vote.user_id == uid,
         Choice.poll_id == poll_id
     ).first()
+    if already:
+        return jsonify({"msg": "Already voted"}), 400
 
-    if existing_vote:
-        return jsonify({"msg": "You already voted in this poll"}), 400
-
-    vote = Vote(user_id=user_id, choice_id=choice_id)
-    db.session.add(vote)
+    db.session.add(Vote(user_id=uid, choice_id=choice_id))
     db.session.commit()
+    return jsonify({"msg": "Vote submitted"}), 201
 
-    return jsonify({"msg": "Vote submitted"})
-
-
+# ───────── Create poll (admin only) ─────────
 @poll_bp.route("", methods=["POST"])
 @jwt_required()
 def create_poll():
-    user_id = int(get_jwt_identity())
+    # role check happens in @admin_required inside admin blueprint (imported lazily)
+    from app.admin import admin_required
+    admin_gate = admin_required(lambda: None)  # create decorator instance
+    resp = admin_gate()
+    if resp is not None:  # means it aborted / returned
+        return resp
 
-    data = request.get_json()
-    title = data.get("title")
+    data    = request.get_json()
+    title   = data.get("title")
     choices = data.get("choices", [])
 
-    if not title or not choices:
-        return jsonify({"msg": "Title and at least one choice are required"}), 400
+    if not title or len(choices) < 2:
+        return jsonify({"msg": "Title and at least two choices required"}), 400
 
     poll = Poll(title=title)
     db.session.add(poll)
-    db.session.flush()
+    db.session.flush()        # we now have poll.id
 
-    for choice_text in choices:
-        choice = Choice(text=choice_text, poll_id=poll.id)
-        db.session.add(choice)
+    for text in choices:
+        db.session.add(Choice(text=text, poll_id=poll.id))
 
     db.session.commit()
-    return jsonify({"msg": "Poll created"}), 201
+    return jsonify({"msg": "Poll created", "poll_id": poll.id}), 201
