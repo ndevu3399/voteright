@@ -6,41 +6,37 @@ from flask_migrate import Migrate
 from flask_bcrypt import Bcrypt
 from flask_jwt_extended import JWTManager
 from flask_cors import CORS
-from app import models
 
-
-db  = SQLAlchemy()
-mg  = Migrate()
-bc  = Bcrypt()
+db = SQLAlchemy()
+migrate = Migrate()
+bcrypt = Bcrypt()
 jwt = JWTManager()
 
 def create_app():
     app = Flask(__name__)
     app.config.from_object("app.config.Config")
 
-    CORS(app,
-         origins=[
-            "http://localhost:5173",
-            "https://voteright.onrender.com",
-         ],
-         supports_credentials=True)
-
+    CORS(app, origins=["http://localhost:5173"], supports_credentials=True)
     db.init_app(app)
-    mg.init_app(app, db)
-    bc.init_app(app)
+    migrate.init_app(app, db)
+    bcrypt.init_app(app)
     jwt.init_app(app)
 
-    from app.auth   import auth_bp
-    from app.routes import poll_bp
-    from app.admin  import admin_bp
-
-    app.register_blueprint(auth_bp,   url_prefix="/api/auth")
-    app.register_blueprint(poll_bp,   url_prefix="/api/polls")
-    app.register_blueprint(admin_bp,  url_prefix="/api")
-
-    # ✅ Table creation using context (Flask 3.x compatible)
+    # Import models here, after db is initialized
+    from app import models  # Move this inside create_app
+    
+    # Setup migrations after models are imported
     with app.app_context():
-        db.create_all()
+        if db.engine.url.drivername == 'sqlite':
+            migrate.init_app(app, db, render_as_batch=True)
+        else:
+            migrate.init_app(app, db)
+
+    from app.auth import auth_bp
+    app.register_blueprint(auth_bp, url_prefix="/api/auth")
+
+    from app.routes import poll_bp
+    app.register_blueprint(poll_bp, url_prefix="/api/polls")
 
     @app.route("/")
     def index():
