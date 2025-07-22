@@ -1,5 +1,3 @@
-# backend/app/__init__.py
-
 print(">>> Using INIT file:", __file__)
 
 from flask import Flask
@@ -24,8 +22,15 @@ def create_app():
     bcrypt.init_app(app)
     jwt.init_app(app)
 
-   
-   
+    # Import models here, after db is initialized
+    from app import models  # Move this inside create_app
+    
+    # Setup migrations after models are imported
+    with app.app_context():
+        if db.engine.url.drivername == 'sqlite':
+            migrate.init_app(app, db, render_as_batch=True)
+        else:
+            migrate.init_app(app, db)
 
     from app.auth import auth_bp
     app.register_blueprint(auth_bp, url_prefix="/api/auth")
@@ -36,13 +41,5 @@ def create_app():
     @app.route("/")
     def index():
         return {"message": "API is running"}
-
-    with app.app_context():
-        try:
-            db.engine.connect()
-            print("✅ Database connection successful!")
-        except Exception as e:
-            print("❌ Database connection failed:", str(e))
-    
 
     return app
